@@ -1,0 +1,41 @@
+version: '2'
+services:
+  webapp1:
+    build: ./Api
+    hostname: webapp1
+    ports:
+      - 5001:80
+    networks:
+      - web  
+    links:
+      - redis
+  webapp2:
+    build: ./Api
+    hostname: webapp2
+    ports:
+      - 5002:80
+    networks:
+      - web 
+    links:
+      - redis 
+  lb:
+    build: ./HaProxy
+    links:
+      - webapp1
+      - webapp2
+    ports:
+      - 5000:80
+    networks:
+      - web
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - 6379:6379
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+    

@@ -1,0 +1,113 @@
+# this config needs haproxy-1.1.28 or haproxy-1.2.1
+global
+  log  127.0.0.1  local0
+  log  127.0.0.1  local1 notice
+  maxconn  4096
+  uid  99
+  gid  99
+  daemon
+
+defaults
+  log   global
+  mode  http
+  option  httplog
+  option  dontlognull
+  retries  3
+  option  redispatch
+  option  http-server-close
+  maxconn  2000
+  timeout connect  5000
+  timeout client  50000
+  timeout server  50000
+
+frontend public
+  bind *:80
+  acl is_websocket hdr(Upgrade) -i WebSocket
+  acl is_websocket_server hdr_end(host) -i ws.example.com
+  use_backend ws if is_websocket is_websocket_server
+  default_backend www
+
+
+backend www
+  timeout server 30s
+  server www1 webapp1
+  server www2 webapp2
+
+backend ws
+  timeout server 600s
+  server ws1 webapp1
+  server ws2 webapp2
+
+
+  **************************************************************
+  With sticky sessions:
+
+  # this config needs haproxy-1.1.28 or haproxy-1.2.1
+global
+  log  127.0.0.1  local0
+  log  127.0.0.1  local1 notice
+  maxconn  4096
+  uid  99
+  gid  99
+  daemon
+
+defaults
+  log   global
+  mode  http
+  option  httplog
+  option  dontlognull
+  retries  3
+  option  redispatch
+  option  http-server-close
+  maxconn  2000
+  timeout connect  5000
+  timeout client  50000
+  timeout server  50000
+
+frontend public
+  bind *:80
+  default_backend api
+
+
+backend api
+  timeout server 30s
+  balance roundrobin
+  cookie SERVERID insert indirect nocache
+  server s1 webapp1 cookie s1
+  server s2 webapp2 cookie s2
+
+  **************************************************************
+  Without sticky sessions:
+
+  # this config needs haproxy-1.1.28 or haproxy-1.2.1
+global
+  log  127.0.0.1  local0
+  log  127.0.0.1  local1 notice
+  maxconn  4096
+  uid  99
+  gid  99
+  daemon
+
+defaults
+  log   global
+  mode  http
+  option  httplog
+  option  dontlognull
+  retries  3
+  option  redispatch
+  option  http-server-close
+  maxconn  2000
+  timeout connect  5000
+  timeout client  50000
+  timeout server  50000
+
+frontend public
+  bind *:80
+  default_backend api
+
+
+backend api
+  timeout server 30s
+  balance roundrobin
+  server s1 webapp1
+  server s2 webapp2

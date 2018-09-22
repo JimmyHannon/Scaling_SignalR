@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+*.user
+*.userprefs
+.vs/
+
+bin/
+obj/
+v15/
+
+TestResult.xunit.xml
